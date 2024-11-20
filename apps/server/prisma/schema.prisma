@@ -1,0 +1,323 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// demo model ----->
+
+model Demo {
+  id           String    @id @default(cuid())
+  firstName    String    @db.VarChar(200)
+  lastName     String    @db.VarChar(200)
+  email        String    @unique @db.VarChar(200)
+  phone        String    @unique @db.VarChar(15)
+  message      String?   @db.VarChar(500)
+  preferedTime DateTime?
+  staffId      String?
+  staff        User?     @relation("StaffDemos", fields: [staffId], references: [id])
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+// staff model -------->
+
+enum UserRole {
+  ADMIN
+  USER
+  STAFF
+}
+
+// Product model ------->
+
+enum PlanInterval {
+  monthly
+  yearly
+  daily
+  weekly
+}
+
+// user model -------->
+
+model User {
+  id                String         @id @default(cuid())
+  firstName         String?        @db.VarChar(200)
+  lastName          String?        @db.VarChar(200)
+  avatar            String?
+  username          String?        @unique
+  emailAddress      String?        @unique
+  subscriptionId    String?        @unique
+  restaurantId      String?        @unique
+  role              UserRole       @default(USER)
+  lastActiveAt      DateTime?
+  lastSignInAt      DateTime?
+  isSubscribed      Boolean        @default(false)
+  isActive          Boolean        @default(true)
+  isBanned          Boolean        @default(false)
+  mfaEnabled        Boolean        @default(false)
+  twoFactorEnabled  Boolean        @default(false)
+  locked            Boolean        @default(false)
+  backupCodeEnabled Boolean        @default(false)
+  createdAt         DateTime       @default(now()) @db.Timestamptz
+  updatedAt         DateTime       @updatedAt @db.Timestamptz
+  // Relations
+  emailAddresses    EmailAddress[] @relation("UserEmailAddress")
+  demos             Demo[]         @relation("StaffDemos")
+  phoneNumbers      Phone[]        @relation("UserPhoneno")
+  subscription      Subscription?  @relation("UserSubscription")
+  restaurant        Restaurant?    @relation("UserRestaurant", fields: [restaurantId], references: [id])
+}
+
+model Phone {
+  id          String   @id @default(cuid())
+  userId      String
+  phoneNumber String
+  isVerified  Boolean  @default(false)
+  createdAt   DateTime @default(now()) @db.Timestamptz
+  updatedAt   DateTime @updatedAt @db.Timestamptz
+
+  // Relations
+  user User? @relation("UserPhoneno", fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model EmailAddress {
+  id           String   @id @default(cuid())
+  emailAddress String   @unique
+  userId       String
+  verification String
+  createdAt    DateTime @default(now()) @db.Timestamptz
+  updatedAt    DateTime @updatedAt @db.Timestamptz
+
+  // Relations
+  user User @relation("UserEmailAddress", fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// restaurant info model --------->
+
+model Restaurant {
+  id                    String              @id @default(cuid())
+  restaurantName        String              @db.VarChar(200)
+  restaurantUrl         String              @db.VarChar(200)
+  restaurantType        String              @db.VarChar(200)
+  foodMenu              String              @db.VarChar(500)
+  tables                Int                 @default(0)
+  staffCount            Int                 @default(0)
+  location              String              @db.VarChar(200)
+  businessEmail         String              @unique @db.VarChar(300)
+  businessContactNumber Int                 @unique
+  companyName           String              @db.VarChar(200)
+  ownerName             String              @db.VarChar(200)
+  restaurantAddress     String              @unique
+  userId                User?               @relation("UserRestaurant")
+  restaurantLegalInfo   String              @unique
+  createdAt             DateTime            @default(now()) @db.Timestamptz
+  updatedAt             DateTime            @updatedAt @db.Timestamptz
+  // relations -->
+  restaurantlegalinfo   RestaurantLegalInfo @relation("RestaurantLegalInfo", fields: [restaurantLegalInfo], references: [id])
+  restaurantaddress     RestaurantAddress   @relation("RestaurantAddress", fields: [restaurantAddress], references: [id])
+}
+
+// restaurant address model --------->
+
+model RestaurantAddress {
+  id           String      @id @default(cuid())
+  address      String      @db.VarChar(500)
+  restaurantId Restaurant? @relation("RestaurantAddress")
+  createdAt    DateTime    @default(now()) @db.Timestamptz
+  updatedAt    DateTime    @updatedAt @db.Timestamptz
+}
+
+// restaurant legal info model ------------->
+
+model RestaurantLegalInfo {
+  id              String      @id @default(cuid())
+  gst             String      @unique @db.VarChar(15)
+  fssaiLicence    String      @db.VarChar(500)
+  msmeCertificate String      @db.VarChar(500)
+  companyPan      String      @db.VarChar(500)
+  phoneNo         String      @unique @db.VarChar(15)
+  directorPan     String      @db.VarChar(500)
+  directorAadhar  String      @db.VarChar(500)
+  email           String      @unique @db.VarChar(200)
+  cancelCheque    String      @db.VarChar(500)
+  restaurantId    Restaurant? @relation("RestaurantLegalInfo")
+  createdAt       DateTime    @default(now()) @db.Timestamptz
+  updatedAt       DateTime    @updatedAt @db.Timestamptz
+}
+
+// user subscription model ------>
+
+enum SubscriptionStatus {
+  created
+  active
+  authenticated
+  expired
+  cancelled
+  paused
+  completed
+  pending
+  halted
+}
+
+model Subscription {
+  id                  String               @id @default(cuid())
+  planId              String
+  userId              String               @unique
+  customerId          String?              @unique
+  status              SubscriptionStatus   @default(created)
+  quantity            Int
+  totalCount          Int
+  notes               Json?
+  paymentMethod       String?
+  paidCount           Int
+  remainingCount      Int
+  startAt             Int?
+  endAt               Int?
+  expireBy            Int?
+  createdAt           DateTime             @default(now()) @db.Timestamptz
+  updatedAt           DateTime             @updatedAt @db.Timestamptz
+  chargeAt            Int?
+  shortUrl            String?              @db.VarChar(255)
+  hasScheduledChanges Boolean              @default(false)
+  changeScheduledAt   DateTime?            @db.Timestamptz
+  offerId             String?              @default("") @db.VarChar(255)
+  subscriptionCharged SubscriptionCharge[] @relation("SubscriptionCharged")
+  payments            Payment[]            @relation("Payments")
+  orders              Order[]              @relation("SubscriptionOrder")
+
+  plan Plan  @relation("SubscribePlans", fields: [planId], references: [id])
+  user User? @relation("UserSubscription", fields: [userId], references: [id]) // One-to-one relation to User
+}
+
+enum CardType {
+  credit
+  debit
+}
+
+
+model SubscriptionCharge {
+  id             String   @id @default(uuid())
+  subscriptionId String?
+  orderId        String?  @unique
+  invoiceId      String?  @unique @default("")
+  amount         Int // Amount of charge
+  status         String // Possible values: 'charged', 'failed'
+  paymentId      String?  @unique
+  chargeAt       DateTime @default(now()) @db.Timestamptz
+  createdAt      DateTime @default(now()) @db.Timestamptz
+  updatedAt      DateTime @updatedAt @db.Timestamptz
+
+  order        Order?        @relation("orders", fields: [orderId], references: [id])
+  subscription Subscription? @relation("SubscriptionCharged", fields: [subscriptionId], references: [id])
+  payment      Payment?      @relation("Payments", fields: [paymentId], references: [id])
+}
+
+model Plan {
+  id            String         @id @default(cuid())
+  name          String
+  amount        Int
+  currency      String
+  interval      Int
+  period        PlanInterval
+  isActive      Boolean        @default(true)
+  description   String?        @db.VarChar(300)
+  hsnCode       String?        @db.VarChar(50)
+  sacCode       String?        @db.VarChar(50)
+  taxInclusive  Boolean        @default(true)
+  createdAt     DateTime       @default(now()) @db.Timestamptz
+  updatedAt     DateTime       @updatedAt @db.Timestamptz
+  subscriptions Subscription[] @relation("SubscribePlans")
+}
+
+// Payment model  --------->
+
+enum PaymentStatus {
+  initiated
+  authorized
+  captured
+  refunded
+  failed
+}
+
+model Payment {
+  id                   String              @id @default(cuid())
+  amount               Int
+  cusId                String?
+  currency             String
+  status               PaymentStatus       @default(initiated)
+  paymentMethod        String              @db.VarChar(255)
+  bank                 String?
+  orderId              String?             @unique
+  vpa                  String?
+  bankTransitionId     String?
+  amountRefunded       Int                 @default(0)
+  refundStatus         String?
+  captured             Boolean             @default(false)
+  refunded             Boolean             @default(false)
+  fee                  Int? // Fee charged by the payment provider
+  errorCode            String? // If any error occurs during payment
+  wallet               String?
+  subscriptionId       String?
+  tokenId              String?
+  acquirerTransitionId String?
+  email                String              @db.VarChar(255)
+  contact              String              @db.VarChar(255)
+  invoice              String              @unique
+  cardId               String?
+  createdAt            DateTime            @default(now()) @db.Timestamptz
+  updatedAt            DateTime            @updatedAt @db.Timestamptz
+  cardName             String?
+  last4                Int?
+  network              String?             @db.VarChar(200)
+  cardType             CardType            @default(debit)
+  refund refund[] @relation("refund")
+  // relation -->
+  SubscriptionCharge   SubscriptionCharge? @relation("Payments")
+  subscription         Subscription?       @relation("Payments", fields: [subscriptionId], references: [id])
+
+  
+}
+
+// order model ---->
+model Order {
+  id                 String   @id @default(uuid())
+  amount             Int
+  amountPaid         Int
+  subscriptionId     String?
+  currency           String?
+  subscriptionCharge String?
+  paymentId          String?
+  attempts           Int      @default(1)
+  status             String   @default("pending")
+  createdAt          DateTime @default(now()) @db.Timestamptz
+  updatedAt          DateTime @updatedAt @db.Timestamptz
+
+  subscriptioncharge SubscriptionCharge? @relation("orders")
+  subscription       Subscription?       @relation("SubscriptionOrder", fields: [subscriptionId], references: [id])
+}
+
+
+enum RefundStatus {
+  pending
+  failed
+  processed 
+  
+}
+// refund model -------->
+model refund{
+  id String @id @default(uuid())
+  status RefundStatus @default(pending)
+  amount Int
+  currency String?
+  paymentId String
+  speed String?
+  referenceNo String?
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @updatedAt @db.Timestamptz
+
+  payment Payment @relation("refund",fields: [paymentId], references: [id])
+}
+

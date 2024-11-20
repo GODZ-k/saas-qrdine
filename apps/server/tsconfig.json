@@ -1,0 +1,39 @@
+// {
+//   "compilerOptions": {
+//     "target": "es2020",                                  /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
+//     "lib": ["es2020"],
+//     /* Modules */
+//     "module": "Node16",                                /* Specify what module code is generated. */
+//     "rootDir": ".",                                  /* Specify the root folder within your source files. */
+//     "moduleResolution": "Node16",                     /* Specify how TypeScript looks up a file from a given module specifier. */                                /* Specify multiple folders that act like './node_modules/@types'. */
+//     "types": ["node"],
+//     /* JavaScript Support */                        
+//        "outDir": "./dist",                                   /* Specify an output folder for all emitted files. */
+//     "esModuleInterop": true,                             /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */
+//     "forceConsistentCasingInFileNames": true,            /* Ensure that casing is correct in imports. */
+
+//     /* Type Checking */
+//     "strict": true,                                      /* Enable all strict type-checking options. */
+//     /* Completeness */
+//     "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
+//   },
+//   "include": ["src/**/*","server.ts" ,"src/**/*.d.ts"],                 // Include all TypeScript files in the src directory
+//   "exclude": ["node_modules", "**/*.spec.ts"] // Exclude node_modules and test files
+// }
+
+{
+  "compilerOptions": {
+    "module": "ESNext",        // Important: This allows TypeScript to output ES Modules
+    "target": "ESNext",  
+    "rootDir": ".",      // Can also be "ES6" or "ES2020"
+    "moduleResolution": "node", // Ensures node-style module resolution
+    "esModuleInterop": true,   // Helps with compatibility when importing CJS modules
+    "skipLibCheck": true,      // Skips type checking of declaration files (optional)
+    "forceConsistentCasingInFileNames": true,  // Ensures consistent file naming
+    "outDir": "./dist",        // Output directory for compiled files
+    "strict": true,            // Enables strict type checking (optional but recommended)
+    "resolveJsonModule": true  // If you're importing JSON files
+  },
+  "include": ["src/**/*","server.ts" , "app.log" ,"src/**/*.d.ts", "src/utils/.ts"],                 // Include all TypeScript files in the src directory
+  "exclude": ["node_modules", "**/*.spec.ts"] // Exclude node_modules and test files
+}

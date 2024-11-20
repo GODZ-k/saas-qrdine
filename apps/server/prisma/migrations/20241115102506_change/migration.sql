@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Plan" ALTER COLUMN "description" DROP NOT NULL,
+ALTER COLUMN "hsnCode" DROP NOT NULL,
+ALTER COLUMN "sacCode" DROP NOT NULL;
