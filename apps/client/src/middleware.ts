@@ -8,6 +8,7 @@ const isPublicRoute = createRouteMatcher(['/auth(.*)', '/' , '/api/v1/webhook/re
 const isAuthRoute = createRouteMatcher(['/auth(.*)'])
 const isUserRoute = createRouteMatcher(['/user(.*)']);
 const isAdminRoute = createRouteMatcher(['/admin(.*)']);
+const isSubscriptionRoutes = createRouteMatcher('/subscription(.*)')
 const isStaffRoute = createRouteMatcher(['/staff(.*)'])
 
 export default clerkMiddleware(async (auth, req) => {

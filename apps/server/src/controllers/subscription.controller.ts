@@ -13,8 +13,7 @@ class Subscription {
         quantity?: number;
       }
 
-      // const user  =  req.user
-      const user = "user_2p1FJRPXzmWsqAEEOfYJ3M9I85h";
+      const user  =  req.user
       const inputData: SubscriptionInputType = req.body;
 
       const loggedInUser = await prisma.user.findUnique({
@@ -28,6 +27,20 @@ class Subscription {
           success: false,
           msg: "User not exists",
         });
+      }
+
+      if(loggedInUser.subscriptionId){
+        const subscriptionData = await prisma.subscription.findUnique({
+          where:{
+            id:loggedInUser?.subscriptionId
+          }
+        })
+  
+        if(subscriptionData){
+          return res.status(400).json({
+            msg:"You already have a subscription . please cancel or update your subscription ."
+          })
+        }
       }
 
       const subscriptionInput: SubscriptionInputType = {
@@ -53,6 +66,9 @@ class Subscription {
         customer_notify: 1,
       });
 
+      
+
+     await prisma.$transaction( async (prisma)=>{
       const subscribed = await prisma.subscription.create({
         data: {
           id: subscription.id,
@@ -84,8 +100,19 @@ class Subscription {
         })
       }
 
+      await prisma.user.update({
+        where:{
+          id:loggedInUser.id
+        },
+        data:{
+          subscriptionId:subscribed.id,
+          isSubscribed:true
+        }
+      })
+     })
+
       return res.status(200).json({
-        subscribed,
+        subscription,
         msg: "subscription created successfully",
       });
       

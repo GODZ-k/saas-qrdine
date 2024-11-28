@@ -67,8 +67,8 @@ model User {
   emailAddresses    EmailAddress[] @relation("UserEmailAddress")
   demos             Demo[]         @relation("StaffDemos")
   phoneNumbers      Phone[]        @relation("UserPhoneno")
-  subscription      Subscription?  @relation("UserSubscription")
-  restaurant        Restaurant?    @relation("UserRestaurant", fields: [restaurantId], references: [id])
+  subscription      Subscription[]  @relation("UserSubscription")
+  restaurant        Restaurant?    @relation("UserRestaurant", fields: [restaurantId], references: [id] , onDelete: Cascade)
 }
 
 model Phone {
@@ -163,9 +163,9 @@ enum SubscriptionStatus {
 }
 
 model Subscription {
-  id                  String               @id @default(cuid())
+  id                  String  @id @default(cuid())
   planId              String
-  userId              String               @unique
+  userId              String
   customerId          String?              @unique
   status              SubscriptionStatus   @default(created)
   quantity            Int
@@ -189,7 +189,7 @@ model Subscription {
   orders              Order[]              @relation("SubscriptionOrder")
 
   plan Plan  @relation("SubscribePlans", fields: [planId], references: [id])
-  user User? @relation("UserSubscription", fields: [userId], references: [id]) // One-to-one relation to User
+  user User @relation("UserSubscription", fields: [userId], references: [id]) // One-to-one relation to User
 }
 
 enum CardType {

@@ -35,6 +35,7 @@ class User {
             }) 
         }
     
+        console.log(loggedInUser)
         return res.status(200).json({
             success:true,
             loggedInUser,

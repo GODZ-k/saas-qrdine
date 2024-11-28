@@ -1,9 +1,10 @@
 import { Router } from "express";
 import Subscription from "../controllers/subscription.controller.js";
 import Addon from "../controllers/addons.controller.js";
+import { requireUser } from "../middleware/user.middleware.js";
 const router:Router = Router()
 
-router.route('/').post(Subscription.create)
+router.route('/').post(requireUser,Subscription.create)
 router.route('/:sub_id').get(Subscription.getById)
 router.route('/').get(Subscription.getAll)
 router.route('/:sub_id/cancel').post(Subscription.cancel)

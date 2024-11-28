@@ -18,6 +18,7 @@ import Loading from "@/app/loading";
 import { useRouter } from "next/navigation";
 import Social_auth from "@/components/auth/Social_auth";
 import { authRoutes, publicRoutes } from "@/Routes";
+import { SignInWithPasskeyButton } from "@/components/SignInWithPasskeyButton";
 
 interface SignInUser {
   email: string;
@@ -163,6 +164,8 @@ function SignIn() {
               Sign up
             </Link>
           </div>
+
+          <SignInWithPasskeyButton/>
         </CardContent>
       </Card>
     </div>

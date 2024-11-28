@@ -68,7 +68,7 @@ class Plan {
     } catch (error) {
       console.log(error);
       return res.status(500).json({
-        msg: "Internal server error",
+        msg: error.error.description ||"Internal server error",
       });
     }
   }
@@ -77,9 +77,11 @@ class Plan {
     try{
         const user = req.user
 
-        const plans = await rzp.plans.all()
+        const plans = await prisma.plan.findMany({ where:{
+          isActive:true
+        }})
 
-        if(!plans || plans.items.length === 0){
+        if(!plans || plans.length === 0){
             return res.status(404).json({
                 msg:"Plans not found"
             })
