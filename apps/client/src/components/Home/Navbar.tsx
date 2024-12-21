@@ -79,7 +79,9 @@ function Navbar() {
           </div>
           <div className=" flex gap-2 items-center ">
             <span className=" font-semibold">Welcome,</span>
-            <UserButton />
+            <UserButton
+            appearance={{ elements: { 
+              userButtonPopoverFooter: { display: "none" }} } } />
             {/* <Button onClick={handleSignOut} className="bg-red-600  hover:bg-red-500">
           <Link href="/auth/sign-in">Logout</Link>
         </Button> */}
